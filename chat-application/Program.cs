@@ -1,3 +1,5 @@
+using chat_application.hubs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,7 +9,33 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add SignalR
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
+
+// Add CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
+
+// Use CORS
+app.UseCors("AllowAllOrigins");
+
+// Enable WebSockets (for SignalR)
+app.UseWebSockets();
+
+// Map SignalR Hub
+app.MapHub<ChatHub>("/chatHub");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -16,10 +44,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+//app.MapControllers();
 
 app.Run();
