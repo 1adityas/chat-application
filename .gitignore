@@ -26,3 +26,4 @@ dist-ssr
 *.sln
 *.sw?
 chat-application-client/package-lock.json
+/chat-application/.vs/chat-application
