@@ -27,3 +27,4 @@ dist-ssr
 *.sw?
 chat-application-client/package-lock.json
 /chat-application/.vs/chat-application
+/chat-application/.vs/ProjectEvaluation
