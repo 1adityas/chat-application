@@ -1,17 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.scss'
-
+import styles from "./App.module.scss";
+import ChatScreen from "./components/chat-screen/ChatScreen.tsx";
+import ChatsList from "./components/chats-list/ChatsList.tsx";
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (<div className="layout">
-    <header className="header">Header</header>
-    <nav className="sidebar">Sidebar</nav>
-    <main className="content">Main Content</main>
-  </div>)
-
+  return (
+    <>
+      <div className={styles.layout}>
+        <header className={styles.header}>Header</header>
+        <nav className={styles.sidebar}>
+          <ChatsList />
+        </nav>
+        <main className={styles.content}>
+          <ChatScreen />
+        </main>
+      </div>
+    </>
+  );
 }
 
-export default App
+export default App;
