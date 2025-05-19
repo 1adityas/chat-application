@@ -1,12 +1,17 @@
 import styles from "./App.module.scss";
 import ChatScreen from "./components/chat-screen/ChatScreen.tsx";
 import ChatsList from "./components/chats-list/ChatsList.tsx";
-function App() {
+import { ThemeProvider } from "./context/ThemeContext";
+import ThemeToggle from "./components/theme-toggle/ThemeToggle";
 
+function App() {
   return (
-    <>
+    <ThemeProvider>
       <div className={styles.layout}>
-        <header className={styles.header}>Header</header>
+        <header className={styles.header}>
+          <span>Header</span>
+          <ThemeToggle />
+        </header>
         <nav className={styles.sidebar}>
           <ChatsList />
         </nav>
@@ -14,7 +19,7 @@ function App() {
           <ChatScreen />
         </main>
       </div>
-    </>
+    </ThemeProvider>
   );
 }
 

@@ -1,0 +1,64 @@
+:root {
+  // WhatsApp brand colors
+  --whatsapp-green: #25D366;
+  --whatsapp-teal: #128C7E;
+  --whatsapp-blue: #34B7F1;
+
+  // Light theme variables (WhatsApp Web Light)
+  --primary-color-light: #FFFFFF;
+  --secondary-color-light: #F0F2F5;
+  --text-color-light: #111B21;
+  --text-secondary-light: #667781;
+  --header-bg-light: #00A884;
+  --sidebar-bg-light: #FFFFFF;
+  --content-bg-light: #EFEAE2;
+  --border-color-light: #E9EDEF;
+  --message-out-light: #D9FDD3;
+  --message-in-light: #FFFFFF;
+  --hover-light: #F5F6F6;
+
+  // Dark theme variables (WhatsApp Web Dark)
+  --primary-color-dark: #111B21;
+  --secondary-color-dark: #222E35;
+  --text-color-dark: #E9EDEF;
+  --text-secondary-dark: #8696A0;
+  --header-bg-dark: #202C33;
+  --sidebar-bg-dark: #111B21;
+  --content-bg-dark: #0B141A;
+  --border-color-dark: #222D34;
+  --message-out-dark: #005C4B;
+  --message-in-dark: #202C33;
+  --hover-dark: #202C33;
+}
+
+// Light theme
+[data-theme="light"] {
+  --primary-color: var(--primary-color-light);
+  --secondary-color: var(--secondary-color-light);
+  --text-color: var(--text-color-light);
+  --text-secondary: var(--text-secondary-light);
+  --header-bg: var(--header-bg-light);
+  --sidebar-bg: var(--sidebar-bg-light);
+  --content-bg: var(--content-bg-light);
+  --border-color: var(--border-color-light);
+  --message-out: var(--message-out-light);
+  --message-in: var(--message-in-light);
+  --hover: var(--hover-light);
+  --accent-color: var(--whatsapp-teal);
+}
+
+// Dark theme
+[data-theme="dark"] {
+  --primary-color: var(--primary-color-dark);
+  --secondary-color: var(--secondary-color-dark);
+  --text-color: var(--text-color-dark);
+  --text-secondary: var(--text-secondary-dark);
+  --header-bg: var(--header-bg-dark);
+  --sidebar-bg: var(--sidebar-bg-dark);
+  --content-bg: var(--content-bg-dark);
+  --border-color: var(--border-color-dark);
+  --message-out: var(--message-out-dark);
+  --message-in: var(--message-in-dark);
+  --hover: var(--hover-dark);
+  --accent-color: var(--whatsapp-green);
+}
