@@ -1,128 +1,164 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
-// import ChatBubble from './ChatBubble'; // Assume you have a ChatBubble component
-import './ChatScreen.scss'; // Optional: Add styles for the chat screen
+import ChatBubble from './ChatBubble';
+import styles from './ChatScreen.module.scss';
 
-// Define the structure of a Message object
 interface Message {
-    userid: string; // Unique identifier for the message, typically a timestamp or UUID
-    user: string;   // The name or identifier of the user who sent the message
-    text: string;   // The content of the message
+    userid: string;
+    user: string;
+    text: string;
+    timestamp: string;
+    status?: 'sent' | 'delivered' | 'read';
 }
 
 const ChatScreen: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
+    const [isAttachmentMenuOpen, setIsAttachmentMenuOpen] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // Create a new SignalR connection to the chatHub endpoint
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl('https://localhost:5138/chatHub') // Replace with your SignalR server URL
-            .withAutomaticReconnect() // Automatically reconnect if the connection is lost
+            .withUrl('https://localhost:5138/chatHub')
+            .withAutomaticReconnect()
             .build();
 
-        // Start the SignalR connection and log any errors
         connection.start().catch(err => console.error('SignalR Connection Error:', err));
 
-        // Listen for the 'ReceiveMessage' event from the server
         connection.on('ReceiveMessage', (user: string, text: string) => {
-            // Update the messages state with the new message received
             setMessages(prevMessages => [
                 ...prevMessages,
-                { userid: Date.now().toString(), user, text }, // Add the new message to the list
+                {
+                    userid: Date.now().toString(),
+                    user,
+                    text,
+                    timestamp: new Date().toLocaleTimeString([], { 
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
+                    status: 'delivered'
+                },
             ]);
         });
 
-        // Cleanup function to stop the SignalR connection when the component unmounts
         return () => {
             connection.stop();
         };
-    }, []); // Empty dependency array ensures this effect runs only once when the component mounts
+    }, []);
 
     useEffect(() => {
-        // Scroll to the bottom of the chat container whenever messages are updated
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
-    }, [messages]); // Dependency on messages ensures this effect runs whenever messages change
+    }, [messages]);
 
     const sendMessage = async () => {
-        // Check if the new message is not empty or just whitespace
         if (newMessage.trim()) {
-            // Create a new SignalR connection to the chatHub endpoint
             const connection = new signalR.HubConnectionBuilder()
-                .withUrl('https://localhost:5138/chatHub') // Replace with your SignalR server URL
-                .withAutomaticReconnect() // Automatically reconnect if the connection is lost
+                .withUrl('https://localhost:5138/chatHub')
+                .withAutomaticReconnect()
                 .build();
 
-            // Start the SignalR connection
             await connection.start();
-
-            // Log the message being sent for debugging purposes
-            console.log('Sending message:', newMessage);
-
-            // Invoke the 'SendMessage' method on the server with the user and message content
-            await connection.invoke('SendMessage','User', newMessage);
-
-            // Clear the input field after sending the message
+            await connection.invoke('SendMessage', 'User', newMessage);
             setNewMessage('');
         }
     };
 
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    };
+
     return (
-        
-        <div className="chat-screen">
-            <div className="chat-header">
-                <div className="user-info">
-                    <img src="default-avatar.png" alt="User Avatar" className="avatar" />
-                    <span className="username">Chat Room</span>
+        <div className={styles.chatScreen}>
+            <div className={styles.chatHeader}>
+                <div className={styles.userInfo}>
+                    <img 
+                        src="https://via.placeholder.com/40" 
+                        alt="Contact Avatar" 
+                        className={styles.avatar} 
+                    />
+                    <div className={styles.userDetails}>
+                        <span className={styles.username}>Chat Room</span>
+                        <span className={styles.status}>online</span>
+                    </div>
                 </div>
-                <div className="header-actions">
-                    <button className="icon-button">
+                <div className={styles.headerActions}>
+                    <button className={styles.iconButton}>
                         <i className="fas fa-search"></i>
                     </button>
-                    <button className="icon-button">
+                    <button className={styles.iconButton}>
                         <i className="fas fa-ellipsis-v"></i>
                     </button>
                 </div>
             </div>
 
-            <div className="chat-messages" ref={chatContainerRef}>
-                {messages.map((message) => (
-                    <div 
-                        key={message.userid}
-                        className={`message ${message.user === 'User' ? 'sent' : 'received'}`}
-                    >
-                        <div className="message-content">
-                            <p>{message.text}</p>
-                            <span className="message-time">
-                                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                        </div>
-                    </div>
-                ))}
+            <div className={styles.chatMessages} ref={chatContainerRef}>
+                <div className={styles.messagesList}>
+                    {messages.map((message) => (
+                        <ChatBubble
+                            key={message.userid}
+                            text={message.text}
+                            timestamp={message.timestamp}
+                            isSent={message.user === 'User'}
+                            status={message.status}
+                        />
+                    ))}
+                </div>
             </div>
 
-            <div className="chat-input">
-                <button className="icon-button">
-                    <i className="far fa-smile"></i>
-                </button>
-                <button className="icon-button">
-                    <i className="fas fa-paperclip"></i>
-                </button>
-                <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    placeholder="Type a message"
-                />
+            <div className={styles.chatInput}>
+                <div className={styles.inputActions}>
+                    <button className={styles.iconButton}>
+                        <i className="far fa-smile"></i>
+                    </button>
+                    <div className={styles.attachmentContainer}>
+                        <button 
+                            className={styles.iconButton}
+                            onClick={() => setIsAttachmentMenuOpen(!isAttachmentMenuOpen)}
+                        >
+                            <i className="fas fa-paperclip"></i>
+                        </button>
+                        {isAttachmentMenuOpen && (
+                            <div className={styles.attachmentMenu}>
+                                <button className={styles.attachmentOption}>
+                                    <i className="fas fa-image"></i>
+                                    <span>Photos & Videos</span>
+                                </button>
+                                <button className={styles.attachmentOption}>
+                                    <i className="fas fa-file"></i>
+                                    <span>Document</span>
+                                </button>
+                                <button className={styles.attachmentOption}>
+                                    <i className="fas fa-camera"></i>
+                                    <span>Camera</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className={styles.inputWrapper}>
+                    <textarea
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Type a message"
+                        rows={1}
+                        className={styles.messageInput}
+                    />
+                </div>
                 <button 
-                    className="icon-button send-button"
+                    className={`${styles.iconButton} ${styles.sendButton}`}
                     onClick={sendMessage}
                 >
-                    <i className="fas fa-paper-plane"></i>
+                    {newMessage.trim() ? (
+                        <i className="fas fa-paper-plane"></i>
+                    ) : (
+                        <i className="fas fa-microphone"></i>
+                    )}
                 </button>
             </div>
         </div>

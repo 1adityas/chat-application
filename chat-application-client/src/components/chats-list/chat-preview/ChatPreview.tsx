@@ -6,7 +6,8 @@ interface ChatPreviewProps {
   name: string;
   lastMessage: string;
   time: string;
-  unreadCount?: number;
+  unreadCount: number;
+  isTyping?: boolean;
 }
 
 const ChatPreview: React.FC<ChatPreviewProps> = ({
@@ -14,21 +15,28 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
   name,
   lastMessage,
   time,
-  unreadCount = 0
+  unreadCount = 0,
+  isTyping = false
 }) => {
   return (
-    <div className={styles['chat-card']}>
-      <img src={profilePic} alt={`${name}'s profile`} className={styles.__avatar} />
-      <div className={styles.__content}>
-        <div className={styles.__header}>
-          <span className={styles['chat-card__name']}>{name}</span>
-          <span className={styles['chat-card__time']}>{time}</span>
+    <div className={styles.chatPreview}>
+      <img 
+        src={profilePic} 
+        alt={`${name}'s profile`} 
+        className={styles.avatar} 
+      />
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <h2 className={styles.name}>{name}</h2>
+          <span className={styles.time}>{time}</span>
         </div>
-        <div className={styles.__footer}>
-            <span className={styles['chat-card__message']}>{lastMessage}</span>
-            {unreadCount > 0 && (
-            <span className={styles['chat-card__badge']}>{unreadCount}</span>
-            )}
+        <div className={styles.footer}>
+          <span className={`${styles.message} ${isTyping ? styles.typing : ''}`}>
+            {lastMessage}
+          </span>
+          {unreadCount > 0 && (
+            <span className={styles.unreadBadge}>{unreadCount}</span>
+          )}
         </div>
       </div>
     </div>
